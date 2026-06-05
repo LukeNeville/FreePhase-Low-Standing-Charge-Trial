@@ -1,1 +1,40 @@
+import pandas as pd
 
+# Load the CSV
+df = pd.read_csv("Low standing charge query_2026-06-05-1411.csv")
+
+# Prepare an empty list to collect output rows
+output_rows = []
+
+for _, row in df.iterrows():
+    account = row["ACCOUNT_NUMBER"]
+    dual_fuel = row["DUEL_FUEL"]
+
+    # Always add the electricity credit
+    output_rows.append({
+        "Account number": account,
+        "Action": "Credit",
+        "Amount": "£6.25",
+        "Reason": "Low_standing_charge_elec",
+        "Note": "",
+        "LedgerType": ""
+    })
+
+    # If dual fuel = TRUE, add a second row for gas
+    if str(dual_fuel).upper() == "TRUE":
+        output_rows.append({
+            "Account number": account,
+            "Action": "Credit",
+            "Amount": "£6.25",
+            "Reason": "Low_standing_charge_gas",
+            "Note": "",
+            "LedgerType": ""
+        })
+
+# Convert to DataFrame
+output_df = pd.DataFrame(output_rows)
+
+# Save to CSV
+output_df.to_csv("low_standing_charge_output.csv", index=False)
+
+print("Done! File saved as low_standing_charge_output.csv")
